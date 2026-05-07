@@ -127,3 +127,4 @@ Hay un archivo [`backend/api.http`](backend/api.http) con requests de prueba lis
         ├── pages/
         └── lib/
 ```
+# MatrizPonderada
