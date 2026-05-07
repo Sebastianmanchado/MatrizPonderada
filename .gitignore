@@ -1,0 +1,33 @@
+# Java / Maven
+backend/target/
+backend/.mvn/
+*.class
+*.jar
+*.war
+*.log
+HELP.md
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+
+# Env
+*.env
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# SQL Server volume
+mssql-data/
