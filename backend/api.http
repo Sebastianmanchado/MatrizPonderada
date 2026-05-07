@@ -1,0 +1,123 @@
+### ============================================================
+### Evaluador IA — requests de prueba
+### Usar con la extensión REST Client de VS Code o IntelliJ HTTP Client.
+### Asume el backend levantado en http://localhost:8080.
+### ============================================================
+
+@baseUrl = http://localhost:8080
+
+### --- Listar matrices (la inicial viene precargada en V1) ---
+GET {{baseUrl}}/api/matrices
+
+### --- Detalle de la matriz inicial ---
+GET {{baseUrl}}/api/matrices/1
+
+### --- Crear iniciativa ---
+POST {{baseUrl}}/api/iniciativas
+Content-Type: application/json
+
+{
+  "titulo": "Asistente IA para clasificar reclamos",
+  "descripcionProblema": "Los reclamos llegan sin categorización clara y demoran en ser ruteados al equipo correcto.",
+  "descripcionSolucion": "Modelo de NLP que clasifica el reclamo automáticamente y lo deriva al equipo.",
+  "areaSolicitante": "Atención al cliente",
+  "responsable": "Ana Pérez",
+  "sponsorEjecutivo": "Roberto Gómez",
+  "impactoEsperado": "Reducir el TTR en un 30% y mejorar NPS.",
+  "datosDisponibles": "Histórico de tickets de los últimos 24 meses con categoría y resolución.",
+  "usuarioCreador": "ana.perez"
+}
+
+### --- Listar iniciativas ---
+GET {{baseUrl}}/api/iniciativas
+
+### --- Listar filtrando ---
+GET {{baseUrl}}/api/iniciativas?estado=SIN_EVALUAR&search=reclamos
+
+### --- Detalle de la iniciativa 1 ---
+GET {{baseUrl}}/api/iniciativas/1
+
+### --- Editar iniciativa ---
+PUT {{baseUrl}}/api/iniciativas/1
+Content-Type: application/json
+
+{
+  "titulo": "Asistente IA para clasificación de reclamos (v2)",
+  "descripcionProblema": "Los reclamos llegan sin categorización clara.",
+  "descripcionSolucion": "Modelo NLP de clasificación automática.",
+  "areaSolicitante": "Atención al cliente",
+  "responsable": "Ana Pérez",
+  "sponsorEjecutivo": "Roberto Gómez",
+  "impactoEsperado": "Reducir TTR 30%.",
+  "datosDisponibles": "Tickets de 24 meses.",
+  "usuarioCreador": "ana.perez"
+}
+
+### --- Crear evaluación con la matriz inicial (id=1) ---
+### Reemplazá los IDs de dimensión y veto según la respuesta de GET /api/matrices/1.
+### Para la matriz seed: dimensiones 1..6 y vetos 1..3.
+POST {{baseUrl}}/api/iniciativas/1/evaluaciones
+Content-Type: application/json
+
+{
+  "idMatriz": 1,
+  "usuarioEvaluador": "juan.eval",
+  "scores": [
+    { "idMatrizDimension": 1, "score": 5 },
+    { "idMatrizDimension": 2, "score": 4 },
+    { "idMatrizDimension": 3, "score": 4 },
+    { "idMatrizDimension": 4, "score": 4 },
+    { "idMatrizDimension": 5, "score": 5 },
+    { "idMatrizDimension": 6, "score": 5 }
+  ],
+  "vetos": [
+    { "idMatrizVeto": 1, "aplica": false },
+    { "idMatrizVeto": 2, "aplica": false },
+    { "idMatrizVeto": 3, "aplica": false }
+  ],
+  "notas": "Evaluación inicial de prueba"
+}
+
+### --- Historial de evaluaciones de la iniciativa ---
+GET {{baseUrl}}/api/iniciativas/1/evaluaciones
+
+### --- Detalle de la evaluación 1 ---
+GET {{baseUrl}}/api/evaluaciones/1
+
+### --- Crear matriz nueva ---
+POST {{baseUrl}}/api/matrices
+Content-Type: application/json
+
+{
+  "nombre": "Matriz simplificada 3 dimensiones",
+  "descripcion": "Versión liviana para tests",
+  "usuarioCreador": "admin",
+  "dimensiones": [
+    { "nombre": "Impacto",  "descripcion": "Beneficio esperado",   "peso": 0.50, "orden": 1, "invertida": false },
+    { "nombre": "Datos",    "descripcion": "Disponibilidad",       "peso": 0.30, "orden": 2, "invertida": false },
+    { "nombre": "Esfuerzo", "descripcion": "5 = mín. complejidad", "peso": 0.20, "orden": 3, "invertida": true }
+  ],
+  "vetos": [
+    { "descripcion": "No hay sponsor ejecutivo", "orden": 1 }
+  ]
+}
+
+### --- Intentar editar la matriz seed (debe fallar con 409 si ya tiene evaluaciones) ---
+PUT {{baseUrl}}/api/matrices/1
+Content-Type: application/json
+
+{
+  "nombre": "Matriz modificada",
+  "descripcion": "no debería poderse",
+  "usuarioCreador": "admin",
+  "dimensiones": [
+    { "nombre": "X", "descripcion": "x", "peso": 1.0, "orden": 1, "invertida": false }
+  ],
+  "vetos": []
+}
+
+### --- Soft-delete de matriz ---
+DELETE {{baseUrl}}/api/matrices/2
+
+### --- Eliminar iniciativa ---
+DELETE {{baseUrl}}/api/iniciativas/1

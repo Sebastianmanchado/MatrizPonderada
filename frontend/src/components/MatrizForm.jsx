@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { matricesApi } from '../api/client';
 import { Button } from './ui/Button';
-import { Input, Textarea, Field, Select } from './ui/Input';
+import { Input, Textarea, Field } from './ui/Input';
 
 const TOLERANCIA = 0.0001;
 
