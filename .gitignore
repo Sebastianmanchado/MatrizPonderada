@@ -22,12 +22,10 @@ frontend/.vite/
 frontend/coverage/
 
 # Env
+.env
 *.env
 !.env.example
 
 # OS
 .DS_Store
 Thumbs.db
-
-# SQL Server volume
-mssql-data/

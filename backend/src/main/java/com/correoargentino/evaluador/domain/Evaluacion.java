@@ -29,6 +29,15 @@ public class Evaluacion {
     @JoinColumn(name = "id_iniciativa", nullable = false)
     private Iniciativa iniciativa;
 
+    /**
+     * Versión exacta de la iniciativa contra la que se realizó la evaluación.
+     * El número de versión, el título y los demás campos quedan congelados acá
+     * para que el historial sea consistente aunque la iniciativa siga evolucionando.
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_iniciativa_version", nullable = false)
+    private IniciativaVersion iniciativaVersion;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_matriz", nullable = false)
     private Matriz matriz;

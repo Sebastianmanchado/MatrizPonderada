@@ -6,6 +6,7 @@ import com.correoargentino.evaluador.exception.NotFoundException;
 import com.correoargentino.evaluador.exception.ValidationException;
 import com.correoargentino.evaluador.repository.EvaluacionRepository;
 import com.correoargentino.evaluador.repository.IniciativaRepository;
+import com.correoargentino.evaluador.repository.IniciativaVersionRepository;
 import com.correoargentino.evaluador.repository.MatrizRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +25,16 @@ public class EvaluacionService {
 
     private final EvaluacionRepository evaluacionRepository;
     private final IniciativaRepository iniciativaRepository;
+    private final IniciativaVersionRepository versionRepository;
     private final MatrizRepository matrizRepository;
 
     public EvaluacionService(EvaluacionRepository evaluacionRepository,
                              IniciativaRepository iniciativaRepository,
+                             IniciativaVersionRepository versionRepository,
                              MatrizRepository matrizRepository) {
         this.evaluacionRepository = evaluacionRepository;
         this.iniciativaRepository = iniciativaRepository;
+        this.versionRepository = versionRepository;
         this.matrizRepository = matrizRepository;
     }
 
@@ -38,6 +42,14 @@ public class EvaluacionService {
     public EvaluacionDetalleResponse crear(Long idIniciativa, EvaluacionRequest req) {
         Iniciativa iniciativa = iniciativaRepository.findById(idIniciativa)
                 .orElseThrow(() -> new NotFoundException("Iniciativa no encontrada: " + idIniciativa));
+
+        // La evaluación se congela contra la versión actual de la iniciativa.
+        // Si después se crea una v(n+1), esta evaluación sigue mostrando la v(n).
+        IniciativaVersion versionActual = versionRepository
+                .findByIniciativaIdAndNumeroVersion(iniciativa.getId(), iniciativa.getNumeroVersionActual())
+                .orElseThrow(() -> new NotFoundException(
+                        "No se encontró la versión actual (" + iniciativa.getNumeroVersionActual()
+                                + ") de la iniciativa " + iniciativa.getId()));
 
         Matriz matriz = matrizRepository.findById(req.idMatriz())
                 .orElseThrow(() -> new NotFoundException("Matriz no encontrada: " + req.idMatriz()));
@@ -56,6 +68,7 @@ public class EvaluacionService {
 
         Evaluacion evaluacion = Evaluacion.builder()
                 .iniciativa(iniciativa)
+                .iniciativaVersion(versionActual)
                 .matriz(matriz)
                 .usuarioEvaluador(req.usuarioEvaluador())
                 .fechaEvaluacion(OffsetDateTime.now())

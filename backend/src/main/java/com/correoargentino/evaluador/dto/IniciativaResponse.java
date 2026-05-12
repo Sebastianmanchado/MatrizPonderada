@@ -18,5 +18,6 @@ public record IniciativaResponse(
         EstadoIniciativa estado,
         OffsetDateTime fechaCreacion,
         String usuarioCreador,
+        Integer numeroVersionActual,
         BigDecimal scoreMasReciente
 ) {}

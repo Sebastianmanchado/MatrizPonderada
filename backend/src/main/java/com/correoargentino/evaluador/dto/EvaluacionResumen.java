@@ -15,5 +15,6 @@ public record EvaluacionResumen(
         BigDecimal puntajeTotal,
         Arquetipo arquetipo,
         Resultado resultado,
-        Boolean tieneVeto
+        Boolean tieneVeto,
+        Integer numeroVersionIniciativa
 ) {}

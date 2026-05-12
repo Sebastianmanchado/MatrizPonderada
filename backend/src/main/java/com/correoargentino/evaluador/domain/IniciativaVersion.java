@@ -8,21 +8,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Snapshot inmutable del contenido de una iniciativa en un punto dado.
+ * Cada vez que el responsable corrige/actualiza la iniciativa se crea
+ * una nueva fila acá. Las evaluaciones referencian la versión exacta
+ * con la que se trabajó, así el historial es coherente aunque la
+ * iniciativa siga evolucionando.
+ */
 @Entity
-@Table(name = "iniciativa")
+@Table(name = "iniciativa_version")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Iniciativa {
+public class IniciativaVersion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_iniciativa", nullable = false)
+    private Iniciativa iniciativa;
+
+    @Column(name = "numero_version", nullable = false)
+    private Integer numeroVersion;
 
     @Column(nullable = false, length = 200)
     private String titulo;
@@ -48,32 +60,12 @@ public class Iniciativa {
     @Column(name = "datos_disponibles", nullable = false, length = 2000)
     private String datosDisponibles;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private EstadoIniciativa estado;
+    @Column(name = "usuario_version", nullable = false, length = 150)
+    private String usuarioVersion;
 
-    @Column(name = "fecha_creacion", nullable = false)
-    private OffsetDateTime fechaCreacion;
+    @Column(name = "fecha_version", nullable = false)
+    private OffsetDateTime fechaVersion;
 
-    @Column(name = "usuario_creador", nullable = false, length = 150)
-    private String usuarioCreador;
-
-    /**
-     * Número de la versión vigente. Los campos {@code titulo}, {@code descripcionProblema},
-     * etc. de esta entidad reflejan siempre el contenido de esta versión. El historial
-     * completo vive en {@link IniciativaVersion}.
-     */
-    @Column(name = "numero_version_actual", nullable = false)
-    @Builder.Default
-    private Integer numeroVersionActual = 1;
-
-    @OneToMany(mappedBy = "iniciativa", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("numeroVersion ASC")
-    @Builder.Default
-    private List<IniciativaVersion> versiones = new ArrayList<>();
-
-    public void addVersion(IniciativaVersion v) {
-        v.setIniciativa(this);
-        this.versiones.add(v);
-    }
+    @Column(name = "comentario_version", length = 1000)
+    private String comentarioVersion;
 }

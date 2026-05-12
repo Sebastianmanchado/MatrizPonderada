@@ -18,6 +18,7 @@ public record EvaluacionDetalleResponse(
         Resultado resultado,
         Boolean tieneVeto,
         String notas,
+        IniciativaVersionResponse iniciativaVersion,
         MatrizResponse matriz,
         List<EvaluacionScoreResponse> scores,
         List<EvaluacionVetoResponse> vetos

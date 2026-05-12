@@ -3,12 +3,16 @@ package com.correoargentino.evaluador.service;
 import com.correoargentino.evaluador.domain.Evaluacion;
 import com.correoargentino.evaluador.domain.EstadoIniciativa;
 import com.correoargentino.evaluador.domain.Iniciativa;
+import com.correoargentino.evaluador.domain.IniciativaVersion;
+import com.correoargentino.evaluador.dto.CrearVersionIniciativaRequest;
 import com.correoargentino.evaluador.dto.IniciativaDetalleResponse;
 import com.correoargentino.evaluador.dto.IniciativaRequest;
 import com.correoargentino.evaluador.dto.IniciativaResponse;
+import com.correoargentino.evaluador.dto.IniciativaVersionResponse;
 import com.correoargentino.evaluador.exception.NotFoundException;
 import com.correoargentino.evaluador.repository.EvaluacionRepository;
 import com.correoargentino.evaluador.repository.IniciativaRepository;
+import com.correoargentino.evaluador.repository.IniciativaVersionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +24,24 @@ import java.util.List;
 public class IniciativaService {
 
     private final IniciativaRepository iniciativaRepository;
+    private final IniciativaVersionRepository versionRepository;
     private final EvaluacionRepository evaluacionRepository;
 
-    public IniciativaService(IniciativaRepository iniciativaRepository, EvaluacionRepository evaluacionRepository) {
+    public IniciativaService(IniciativaRepository iniciativaRepository,
+                             IniciativaVersionRepository versionRepository,
+                             EvaluacionRepository evaluacionRepository) {
         this.iniciativaRepository = iniciativaRepository;
+        this.versionRepository = versionRepository;
         this.evaluacionRepository = evaluacionRepository;
     }
 
+    /**
+     * Crea una iniciativa nueva. Internamente también crea la versión 1 con
+     * el contenido provisto, así toda iniciativa tiene historial desde el día 0.
+     */
     @Transactional
     public IniciativaResponse crear(IniciativaRequest req) {
+        OffsetDateTime ahora = OffsetDateTime.now();
         Iniciativa i = Iniciativa.builder()
                 .titulo(req.titulo())
                 .descripcionProblema(req.descripcionProblema())
@@ -39,9 +52,27 @@ public class IniciativaService {
                 .impactoEsperado(req.impactoEsperado())
                 .datosDisponibles(req.datosDisponibles())
                 .estado(EstadoIniciativa.SIN_EVALUAR)
-                .fechaCreacion(OffsetDateTime.now())
+                .fechaCreacion(ahora)
                 .usuarioCreador(req.usuarioCreador())
+                .numeroVersionActual(1)
                 .build();
+
+        // Snapshot v1 (mismo contenido que la iniciativa recién creada).
+        i.addVersion(IniciativaVersion.builder()
+                .numeroVersion(1)
+                .titulo(req.titulo())
+                .descripcionProblema(req.descripcionProblema())
+                .descripcionSolucion(req.descripcionSolucion())
+                .areaSolicitante(req.areaSolicitante())
+                .responsable(req.responsable())
+                .sponsorEjecutivo(req.sponsorEjecutivo())
+                .impactoEsperado(req.impactoEsperado())
+                .datosDisponibles(req.datosDisponibles())
+                .usuarioVersion(req.usuarioCreador())
+                .fechaVersion(ahora)
+                .comentarioVersion("Versión inicial")
+                .build());
+
         Iniciativa guardada = iniciativaRepository.save(i);
         return Mapper.toIniciativaResponse(guardada, null);
     }
@@ -62,13 +93,47 @@ public class IniciativaService {
                 .stream()
                 .map(Mapper::toEvaluacionResumen)
                 .toList();
-        return Mapper.toIniciativaDetalle(i, evaluaciones);
+        var versiones = versionRepository.findByIniciativaIdOrderByNumeroVersionDesc(id).stream()
+                .map(v -> Mapper.toVersionResponse(v, i.getNumeroVersionActual()))
+                .toList();
+        return Mapper.toIniciativaDetalle(i, versiones, evaluaciones);
     }
 
+    /**
+     * Crea una nueva versión inmutable de la iniciativa. Hace todo en una sola transacción:
+     *   - inserta la fila en {@code iniciativa_version} con el número siguiente
+     *   - actualiza la iniciativa para reflejar el contenido de la nueva versión
+     *   - incrementa {@code numeroVersionActual}
+     *
+     * Las evaluaciones existentes siguen apuntando a la versión que evaluaron, así
+     * el historial de evaluación queda consistente.
+     */
     @Transactional
-    public IniciativaResponse actualizar(Long id, IniciativaRequest req) {
-        Iniciativa i = iniciativaRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Iniciativa no encontrada: " + id));
+    public IniciativaVersionResponse crearNuevaVersion(Long idIniciativa, CrearVersionIniciativaRequest req) {
+        Iniciativa i = iniciativaRepository.findById(idIniciativa)
+                .orElseThrow(() -> new NotFoundException("Iniciativa no encontrada: " + idIniciativa));
+
+        int nuevoNumero = i.getNumeroVersionActual() + 1;
+        OffsetDateTime ahora = OffsetDateTime.now();
+
+        IniciativaVersion nueva = IniciativaVersion.builder()
+                .iniciativa(i)
+                .numeroVersion(nuevoNumero)
+                .titulo(req.titulo())
+                .descripcionProblema(req.descripcionProblema())
+                .descripcionSolucion(req.descripcionSolucion())
+                .areaSolicitante(req.areaSolicitante())
+                .responsable(req.responsable())
+                .sponsorEjecutivo(req.sponsorEjecutivo())
+                .impactoEsperado(req.impactoEsperado())
+                .datosDisponibles(req.datosDisponibles())
+                .usuarioVersion(req.usuarioVersion())
+                .fechaVersion(ahora)
+                .comentarioVersion(req.comentarioVersion())
+                .build();
+        IniciativaVersion guardada = versionRepository.save(nueva);
+
+        // Reflejar el contenido vigente en la iniciativa.
         i.setTitulo(req.titulo());
         i.setDescripcionProblema(req.descripcionProblema());
         i.setDescripcionSolucion(req.descripcionSolucion());
@@ -77,7 +142,18 @@ public class IniciativaService {
         i.setSponsorEjecutivo(req.sponsorEjecutivo());
         i.setImpactoEsperado(req.impactoEsperado());
         i.setDatosDisponibles(req.datosDisponibles());
-        return Mapper.toIniciativaResponse(i, scoreMasReciente(id));
+        i.setNumeroVersionActual(nuevoNumero);
+
+        return Mapper.toVersionResponse(guardada, nuevoNumero);
+    }
+
+    @Transactional(readOnly = true)
+    public List<IniciativaVersionResponse> listarVersiones(Long idIniciativa) {
+        Iniciativa i = iniciativaRepository.findById(idIniciativa)
+                .orElseThrow(() -> new NotFoundException("Iniciativa no encontrada: " + idIniciativa));
+        return versionRepository.findByIniciativaIdOrderByNumeroVersionDesc(idIniciativa).stream()
+                .map(v -> Mapper.toVersionResponse(v, i.getNumeroVersionActual()))
+                .toList();
     }
 
     @Transactional

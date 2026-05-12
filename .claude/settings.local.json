@@ -6,7 +6,9 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(mvn -version)",
-      "PowerShell(mvn -version)"
+      "PowerShell(mvn -version)",
+      "Bash(mvn compile *)",
+      "Bash(mvn test *)"
     ]
   }
 }

@@ -37,21 +37,27 @@ GET {{baseUrl}}/api/iniciativas?estado=SIN_EVALUAR&search=reclamos
 ### --- Detalle de la iniciativa 1 ---
 GET {{baseUrl}}/api/iniciativas/1
 
-### --- Editar iniciativa ---
-PUT {{baseUrl}}/api/iniciativas/1
+### --- Crear nueva versión de la iniciativa (reemplaza al PUT) ---
+### Cada cambio de contenido genera una versión nueva e inmutable.
+### Las evaluaciones existentes siguen apuntando a la versión que evaluaron.
+POST {{baseUrl}}/api/iniciativas/1/versiones
 Content-Type: application/json
 
 {
   "titulo": "Asistente IA para clasificación de reclamos (v2)",
   "descripcionProblema": "Los reclamos llegan sin categorización clara.",
-  "descripcionSolucion": "Modelo NLP de clasificación automática.",
+  "descripcionSolucion": "Modelo NLP de clasificación automática + análisis de sentimiento.",
   "areaSolicitante": "Atención al cliente",
   "responsable": "Ana Pérez",
   "sponsorEjecutivo": "Roberto Gómez",
-  "impactoEsperado": "Reducir TTR 30%.",
-  "datosDisponibles": "Tickets de 24 meses.",
-  "usuarioCreador": "ana.perez"
+  "impactoEsperado": "Reducir TTR 35%.",
+  "datosDisponibles": "Tickets de 36 meses con categoría y sentimiento.",
+  "usuarioVersion": "ana.perez",
+  "comentarioVersion": "Sumamos análisis de sentimiento y ampliamos el dataset."
 }
+
+### --- Listar versiones de una iniciativa ---
+GET {{baseUrl}}/api/iniciativas/1/versiones
 
 ### --- Crear evaluación con la matriz inicial (id=1) ---
 ### Reemplazá los IDs de dimensión y veto según la respuesta de GET /api/matrices/1.

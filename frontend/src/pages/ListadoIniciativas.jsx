@@ -123,6 +123,7 @@ export function ListadoIniciativas() {
               <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500 border-b">
                 <tr>
                   <th className="px-4 py-3 font-medium">Título</th>
+                  <th className="px-4 py-3 font-medium">Versión</th>
                   <th className="px-4 py-3 font-medium">Área</th>
                   <th className="px-4 py-3 font-medium">Responsable</th>
                   <th className="px-4 py-3 font-medium">Estado</th>
@@ -138,6 +139,11 @@ export function ListadoIniciativas() {
                     onClick={() => navigate(`/iniciativas/${i.id}`)}
                   >
                     <td className="px-4 py-3 font-medium text-slate-900">{i.titulo}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-2 py-0.5 text-xs font-semibold">
+                        v{i.numeroVersionActual ?? 1}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-slate-700">{i.areaSolicitante}</td>
                     <td className="px-4 py-3 text-slate-700">{i.responsable}</td>
                     <td className="px-4 py-3">

@@ -172,8 +172,21 @@ export function Evaluar() {
         <Link to={`/iniciativas/${id}`} className="text-sm text-slate-600 hover:underline">
           ← Volver a la iniciativa
         </Link>
-        <h1 className="mt-2 text-2xl font-bold">Evaluar: {iniciativa.titulo}</h1>
-        <p className="mt-1 text-sm text-slate-500">{iniciativa.areaSolicitante} · {iniciativa.responsable}</p>
+        <div className="mt-2 flex items-center gap-3 flex-wrap">
+          <h1 className="text-2xl font-bold">Evaluar: {iniciativa.titulo}</h1>
+          {iniciativa.numeroVersionActual != null && (
+            <span className="inline-flex items-center rounded-full bg-brand-100 text-brand-800 px-2 py-0.5 text-xs font-semibold">
+              v{iniciativa.numeroVersionActual} <span className="ml-1 text-[10px] uppercase">actual</span>
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-slate-500">
+          {iniciativa.areaSolicitante} · {iniciativa.responsable}
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
+          La evaluación queda atada a la versión <strong>v{iniciativa.numeroVersionActual}</strong>. Si después se crea
+          una versión nueva, esta evaluación sigue mostrando este snapshot.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

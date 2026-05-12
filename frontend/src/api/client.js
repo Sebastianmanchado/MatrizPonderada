@@ -11,10 +11,12 @@ export const iniciativasApi = {
   list: (params = {}) => api.get('/api/iniciativas', { params }).then((r) => r.data),
   get: (id) => api.get(`/api/iniciativas/${id}`).then((r) => r.data),
   create: (body) => api.post('/api/iniciativas', body).then((r) => r.data),
-  update: (id, body) => api.put(`/api/iniciativas/${id}`, body).then((r) => r.data),
   remove: (id) => api.delete(`/api/iniciativas/${id}`),
   evaluaciones: (id) => api.get(`/api/iniciativas/${id}/evaluaciones`).then((r) => r.data),
   evaluar: (id, body) => api.post(`/api/iniciativas/${id}/evaluaciones`, body).then((r) => r.data),
+  // Versionado: cada modificación de contenido genera una versión nueva inmutable.
+  versiones: (id) => api.get(`/api/iniciativas/${id}/versiones`).then((r) => r.data),
+  crearVersion: (id, body) => api.post(`/api/iniciativas/${id}/versiones`, body).then((r) => r.data),
 };
 
 export const matricesApi = {

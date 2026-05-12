@@ -24,11 +24,14 @@ final class Mapper {
                 i.getEstado(),
                 i.getFechaCreacion(),
                 i.getUsuarioCreador(),
+                i.getNumeroVersionActual(),
                 scoreMasReciente
         );
     }
 
-    static IniciativaDetalleResponse toIniciativaDetalle(Iniciativa i, List<EvaluacionResumen> evals) {
+    static IniciativaDetalleResponse toIniciativaDetalle(Iniciativa i,
+                                                         List<IniciativaVersionResponse> versiones,
+                                                         List<EvaluacionResumen> evals) {
         return new IniciativaDetalleResponse(
                 i.getId(),
                 i.getTitulo(),
@@ -42,7 +45,29 @@ final class Mapper {
                 i.getEstado(),
                 i.getFechaCreacion(),
                 i.getUsuarioCreador(),
+                i.getNumeroVersionActual(),
+                versiones,
                 evals
+        );
+    }
+
+    static IniciativaVersionResponse toVersionResponse(IniciativaVersion v, Integer numeroVersionActualIniciativa) {
+        return new IniciativaVersionResponse(
+                v.getId(),
+                v.getIniciativa().getId(),
+                v.getNumeroVersion(),
+                v.getTitulo(),
+                v.getDescripcionProblema(),
+                v.getDescripcionSolucion(),
+                v.getAreaSolicitante(),
+                v.getResponsable(),
+                v.getSponsorEjecutivo(),
+                v.getImpactoEsperado(),
+                v.getDatosDisponibles(),
+                v.getUsuarioVersion(),
+                v.getFechaVersion(),
+                v.getComentarioVersion(),
+                v.getNumeroVersion().equals(numeroVersionActualIniciativa)
         );
     }
 
@@ -69,6 +94,7 @@ final class Mapper {
     }
 
     static EvaluacionResumen toEvaluacionResumen(Evaluacion e) {
+        Integer numeroVersion = e.getIniciativaVersion() != null ? e.getIniciativaVersion().getNumeroVersion() : null;
         return new EvaluacionResumen(
                 e.getId(),
                 e.getFechaEvaluacion(),
@@ -78,7 +104,8 @@ final class Mapper {
                 e.getPuntajeTotal(),
                 e.getArquetipo(),
                 e.getResultado(),
-                e.getTieneVeto()
+                e.getTieneVeto(),
+                numeroVersion
         );
     }
 
@@ -105,6 +132,11 @@ final class Mapper {
     }
 
     static EvaluacionDetalleResponse toEvaluacionDetalle(Evaluacion e, boolean matrizTieneEvals) {
+        IniciativaVersion ver = e.getIniciativaVersion();
+        IniciativaVersionResponse versionResponse = ver == null
+                ? null
+                : toVersionResponse(ver, e.getIniciativa().getNumeroVersionActual());
+
         return new EvaluacionDetalleResponse(
                 e.getId(),
                 e.getIniciativa().getId(),
@@ -116,6 +148,7 @@ final class Mapper {
                 e.getResultado(),
                 e.getTieneVeto(),
                 e.getNotas(),
+                versionResponse,
                 toMatrizResponse(e.getMatriz(), matrizTieneEvals),
                 e.getScores().stream().map(Mapper::toScoreResponse).toList(),
                 e.getVetos().stream().map(Mapper::toEvalVetoResponse).toList()

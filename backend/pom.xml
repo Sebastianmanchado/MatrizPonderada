@@ -35,18 +35,16 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-sqlserver</artifactId>
-        </dependency>
+        <!--
+            Flyway queda fuera del classpath: en este despliegue Hibernate
+            gestiona el schema con ddl-auto=update. Si en el futuro se vuelve
+            a usar Flyway sobre PostgreSQL, hay que portar V1/V2 a sintaxis
+            PG (ver README, sección "Migración a PostgreSQL").
+        -->
 
         <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 

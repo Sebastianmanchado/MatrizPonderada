@@ -39,6 +39,24 @@ export function DetalleEvaluacion() {
         <h1 className="mt-2 text-2xl font-bold">Evaluación #{data.id}</h1>
         <p className="mt-1 text-sm text-slate-600">
           Iniciativa: <span className="font-medium">{data.tituloIniciativa}</span>
+          {data.iniciativaVersion && (
+            <>
+              {' '}·{' '}
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  data.iniciativaVersion.esActual ? 'bg-brand-100 text-brand-800' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                v{data.iniciativaVersion.numeroVersion}
+                {data.iniciativaVersion.esActual && <span className="ml-1 text-[10px] uppercase">actual</span>}
+              </span>
+              {!data.iniciativaVersion.esActual && (
+                <span className="ml-2 text-xs text-amber-700">
+                  (versión histórica — la iniciativa siguió evolucionando)
+                </span>
+              )}
+            </>
+          )}
         </p>
       </div>
 
@@ -81,6 +99,54 @@ export function DetalleEvaluacion() {
           )}
         </CardBody>
       </Card>
+
+      {data.iniciativaVersion && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Snapshot de la iniciativa (v{data.iniciativaVersion.numeroVersion})
+            </CardTitle>
+            <p className="mt-1 text-xs text-slate-500">
+              Contenido de la iniciativa al momento de evaluarla.
+              {data.iniciativaVersion.comentarioVersion && (
+                <> Comentario: <em>{data.iniciativaVersion.comentarioVersion}</em>.</>
+              )}
+            </p>
+          </CardHeader>
+          <CardBody className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div>
+              <p className="text-xs text-slate-500">Área</p>
+              <p>{data.iniciativaVersion.areaSolicitante}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500">Responsable</p>
+              <p>{data.iniciativaVersion.responsable}</p>
+            </div>
+            <div>
+              <p className="text-xs text-slate-500">Sponsor</p>
+              <p>{data.iniciativaVersion.sponsorEjecutivo}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">Problema</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.descripcionProblema}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">Solución</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.descripcionSolucion}</p>
+            </div>
+            <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-slate-500">Impacto esperado</p>
+                <p className="whitespace-pre-wrap">{data.iniciativaVersion.impactoEsperado}</p>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Datos disponibles</p>
+                <p className="whitespace-pre-wrap">{data.iniciativaVersion.datosDisponibles}</p>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

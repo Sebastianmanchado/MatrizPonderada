@@ -1,9 +1,11 @@
 package com.correoargentino.evaluador.controller;
 
 import com.correoargentino.evaluador.domain.EstadoIniciativa;
+import com.correoargentino.evaluador.dto.CrearVersionIniciativaRequest;
 import com.correoargentino.evaluador.dto.IniciativaDetalleResponse;
 import com.correoargentino.evaluador.dto.IniciativaRequest;
 import com.correoargentino.evaluador.dto.IniciativaResponse;
+import com.correoargentino.evaluador.dto.IniciativaVersionResponse;
 import com.correoargentino.evaluador.service.IniciativaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -39,9 +41,22 @@ public class IniciativaController {
         return service.obtener(id);
     }
 
-    @PutMapping("/{id}")
-    public IniciativaResponse actualizar(@PathVariable Long id, @Valid @RequestBody IniciativaRequest req) {
-        return service.actualizar(id, req);
+    /**
+     * Crea una nueva versión inmutable de la iniciativa. Reemplaza al antiguo
+     * {@code PUT /api/iniciativas/{id}}: toda modificación de contenido genera
+     * una versión nueva. Las evaluaciones existentes mantienen el snapshot de
+     * la versión que evaluaron.
+     */
+    @PostMapping("/{id}/versiones")
+    public ResponseEntity<IniciativaVersionResponse> crearVersion(
+            @PathVariable Long id,
+            @Valid @RequestBody CrearVersionIniciativaRequest req) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearNuevaVersion(id, req));
+    }
+
+    @GetMapping("/{id}/versiones")
+    public List<IniciativaVersionResponse> listarVersiones(@PathVariable Long id) {
+        return service.listarVersiones(id);
     }
 
     @DeleteMapping("/{id}")

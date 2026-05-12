@@ -8,6 +8,7 @@ import com.correoargentino.evaluador.exception.NotFoundException;
 import com.correoargentino.evaluador.exception.ValidationException;
 import com.correoargentino.evaluador.repository.EvaluacionRepository;
 import com.correoargentino.evaluador.repository.IniciativaRepository;
+import com.correoargentino.evaluador.repository.IniciativaVersionRepository;
 import com.correoargentino.evaluador.repository.MatrizRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,13 @@ class EvaluacionServiceTest {
 
     @Mock EvaluacionRepository evaluacionRepository;
     @Mock IniciativaRepository iniciativaRepository;
+    @Mock IniciativaVersionRepository versionRepository;
     @Mock MatrizRepository matrizRepository;
 
     @InjectMocks EvaluacionService service;
 
     private Iniciativa iniciativa;
+    private IniciativaVersion versionActual;
     private Matriz matriz;
     private MatrizDimension dImpacto;
     private MatrizDimension dDatos;
@@ -53,6 +56,19 @@ class EvaluacionServiceTest {
                 .estado(EstadoIniciativa.SIN_EVALUAR)
                 .fechaCreacion(OffsetDateTime.now())
                 .usuarioCreador("u")
+                .numeroVersionActual(1)
+                .build();
+
+        versionActual = IniciativaVersion.builder()
+                .id(50L)
+                .iniciativa(iniciativa)
+                .numeroVersion(1)
+                .titulo("Test")
+                .descripcionProblema("p").descripcionSolucion("s")
+                .areaSolicitante("a").responsable("r").sponsorEjecutivo("sp")
+                .impactoEsperado("ie").datosDisponibles("dd")
+                .usuarioVersion("u")
+                .fechaVersion(OffsetDateTime.now())
                 .build();
 
         matriz = Matriz.builder()
@@ -87,13 +103,15 @@ class EvaluacionServiceTest {
 
     private void mockOk() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.of(matriz));
         when(evaluacionRepository.save(any(Evaluacion.class))).thenAnswer(inv -> {
             Evaluacion e = inv.getArgument(0);
             e.setId(500L);
             return e;
         });
-        when(evaluacionRepository.existsByMatrizId(10L)).thenReturn(true);
+        // existsByMatrizId solo se usa en obtener(), no en crear(). No lo mockeamos acá
+        // para evitar UnnecessaryStubbingException con MockitoExtension strict.
     }
 
     @Test
@@ -112,10 +130,10 @@ class EvaluacionServiceTest {
     @Test
     void crear_puntajeAltoEsfuerzoBajo_majorProject() {
         mockOk();
-        // 5*0.5 + 5*0.3 + 1*0.2 = 4.0 → AVANZA, esfuerzo=1 < 3 → MAJOR_PROJECT
+        // 5*0.5 + 5*0.3 + 1*0.2 = 2.5 + 1.5 + 0.2 = 4.20 → AVANZA, esfuerzo=1 < 3 → MAJOR_PROJECT
         var resp = service.crear(1L, reqCon(5, 5, 1, false));
 
-        assertThat(resp.puntajeTotal()).isEqualByComparingTo("4.00");
+        assertThat(resp.puntajeTotal()).isEqualByComparingTo("4.20");
         assertThat(resp.resultado()).isEqualTo(Resultado.AVANZA);
         assertThat(resp.arquetipo()).isEqualTo(Arquetipo.MAJOR_PROJECT);
         assertThat(iniciativa.getEstado()).isEqualTo(EstadoIniciativa.APROBADO);
@@ -188,6 +206,7 @@ class EvaluacionServiceTest {
     @Test
     void crear_matrizInexistente_lanzaNotFound() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.crear(1L, reqCon(3, 3, 3, false)))
                 .isInstanceOf(NotFoundException.class);
@@ -196,6 +215,7 @@ class EvaluacionServiceTest {
     @Test
     void crear_scoreFueraDeRango_lanzaValidationException() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.of(matriz));
         var bad = new EvaluacionRequest(
                 10L, "u",
@@ -215,6 +235,7 @@ class EvaluacionServiceTest {
     @Test
     void crear_faltaScoreParaDimension_lanzaValidationException() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.of(matriz));
         var bad = new EvaluacionRequest(
                 10L, "u",
@@ -233,6 +254,7 @@ class EvaluacionServiceTest {
     @Test
     void crear_dimensionAjenaALaMatriz_lanzaValidationException() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.of(matriz));
         var bad = new EvaluacionRequest(
                 10L, "u",
@@ -252,6 +274,7 @@ class EvaluacionServiceTest {
     @Test
     void crear_faltaVetoParaMatriz_lanzaValidationException() {
         when(iniciativaRepository.findById(1L)).thenReturn(Optional.of(iniciativa));
+        when(versionRepository.findByIniciativaIdAndNumeroVersion(1L, 1)).thenReturn(Optional.of(versionActual));
         when(matrizRepository.findById(10L)).thenReturn(Optional.of(matriz));
         var bad = new EvaluacionRequest(
                 10L, "u",

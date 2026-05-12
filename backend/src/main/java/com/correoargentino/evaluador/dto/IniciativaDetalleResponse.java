@@ -18,5 +18,7 @@ public record IniciativaDetalleResponse(
         EstadoIniciativa estado,
         OffsetDateTime fechaCreacion,
         String usuarioCreador,
+        Integer numeroVersionActual,
+        List<IniciativaVersionResponse> versiones,
         List<EvaluacionResumen> evaluaciones
 ) {}

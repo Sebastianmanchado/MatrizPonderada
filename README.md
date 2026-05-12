@@ -5,9 +5,10 @@ Aplicación full-stack para evaluar iniciativas de IA mediante matrices de decis
 ## Stack
 
 - **Backend**: Spring Boot 3.3 · Spring Data JPA · Java 17 · Maven
-- **Base de datos**: SQL Server 2022 (Flyway para migraciones)
+- **Base de datos**: PostgreSQL 16 (local en Docker · Neon en producción)
 - **Frontend**: React 18 · Vite · React Router · Axios · Tailwind CSS
 - **Validación**: Bean Validation (backend) · react-hook-form + zod (frontend)
+- **Deploy**: backend en Render (Docker) · DB en Neon
 
 ## Requisitos previos
 
@@ -16,7 +17,17 @@ Aplicación full-stack para evaluar iniciativas de IA mediante matrices de decis
 - Node 18+ (`node -v`)
 - Docker Desktop con compose v2 (`docker compose version`)
 
-## Levantar SQL Server
+## Variables de entorno
+
+El repo trae `.env.example` en la raíz. Copialo a `.env`:
+
+```bash
+cp .env.example .env
+```
+
+El `.env` está gitignoreado. Definí ahí los valores reales en local (en Render se setean desde el panel de Environment).
+
+## Levantar la base de datos local (PostgreSQL en Docker)
 
 Desde la raíz del repo:
 
@@ -24,32 +35,46 @@ Desde la raíz del repo:
 docker compose up -d
 ```
 
-Esto levanta SQL Server 2022 en `localhost:1433` y crea la base `EvaluadorIA` automáticamente vía el contenedor `mssql-init`. Credenciales (solo dev):
+Esto levanta PostgreSQL 16 (`postgres:16-alpine`) en `localhost:5432` con un volumen nombrado para persistir datos entre reinicios. Usuario, password y nombre de base se leen del `.env`. Por defecto:
 
-- Usuario: `sa`
-- Password: `Evaluador#2026`
-- Base: `EvaluadorIA`
+- Usuario: `matriz`
+- Password: `matriz_dev_password`
+- Base: `matriz_ponderada`
 
-Para detener:
+Para parar la base (los datos se conservan en el volumen):
 
 ```bash
 docker compose down
 ```
 
-Para borrar el volumen y empezar de cero:
+Para parar y **borrar todos los datos** (vuelve a un estado limpio):
 
 ```bash
 docker compose down -v
 ```
 
+Ver logs:
+
+```bash
+docker compose logs -f postgres
+```
+
+Conectarte con `psql` sin instalar nada en el host:
+
+```bash
+docker exec -it matriz-postgres psql -U matriz -d matriz_ponderada
+```
+
 ## Backend
+
+Con la base ya corriendo y el `.env` configurado:
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-La app escucha en `http://localhost:8080`. Flyway corre las migraciones automáticamente al levantar (incluye seed de la matriz inicial "Evaluador Correo Argentino — 6 dimensiones").
+La app escucha en `http://localhost:8080`. Hibernate genera el schema automáticamente al primer arranque (`ddl-auto=update`). En el primer arranque, un `DataSeeder` inserta la matriz inicial "Evaluador Correo Argentino - 6 dimensiones" con sus dimensiones y vetos.
 
 Tests:
 
