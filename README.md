@@ -5,65 +5,27 @@ Aplicación full-stack para evaluar iniciativas de IA mediante matrices de decis
 ## Stack
 
 - **Backend**: Spring Boot 3.3 · Spring Data JPA · Java 17 · Maven
-- **Base de datos**: PostgreSQL 16 (local en Docker · Neon en producción)
+- **Base de datos**: SQL Server (hosteada en somee.com)
 - **Frontend**: React 18 · Vite · React Router · Axios · Tailwind CSS
 - **Validación**: Bean Validation (backend) · react-hook-form + zod (frontend)
-- **Deploy**: backend en Render (Docker) · DB en Neon
 
 ## Requisitos previos
 
 - Java 17 (`java -version`)
 - Maven 3.9+ (`mvn -v`)
 - Node 18+ (`node -v`)
-- Docker Desktop con compose v2 (`docker compose version`)
 
 ## Variables de entorno
 
-El repo trae `.env.example` en la raíz. Copialo a `.env`:
+El repo trae `.env.example` en la raíz. Copialo a `.env` y completá la password:
 
 ```bash
 cp .env.example .env
 ```
 
-El `.env` está gitignoreado. Definí ahí los valores reales en local (en Render se setean desde el panel de Environment).
+El `.env` está gitignoreado. NUNCA commitearlo.
 
-## Levantar la base de datos local (PostgreSQL en Docker)
-
-Desde la raíz del repo:
-
-```bash
-docker compose up -d
-```
-
-Esto levanta PostgreSQL 16 (`postgres:16-alpine`) en `localhost:5432` con un volumen nombrado para persistir datos entre reinicios. Usuario, password y nombre de base se leen del `.env`. Por defecto:
-
-- Usuario: `matriz`
-- Password: `matriz_dev_password`
-- Base: `matriz_ponderada`
-
-Para parar la base (los datos se conservan en el volumen):
-
-```bash
-docker compose down
-```
-
-Para parar y **borrar todos los datos** (vuelve a un estado limpio):
-
-```bash
-docker compose down -v
-```
-
-Ver logs:
-
-```bash
-docker compose logs -f postgres
-```
-
-Conectarte con `psql` sin instalar nada en el host:
-
-```bash
-docker exec -it matriz-postgres psql -U matriz -d matriz_ponderada
-```
+La base es remota (SQL Server en somee.com), no hace falta levantar nada local. El JDBC URL ya viene preconfigurado en `.env.example`; solo tenés que cargar `DATABASE_PASSWORD` con la pass del usuario de somee.
 
 ## Backend
 
