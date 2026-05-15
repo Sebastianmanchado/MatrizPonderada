@@ -39,18 +39,29 @@ public class IniciativaService {
      * Crea una iniciativa nueva. Internamente también crea la versión 1 con
      * el contenido provisto, así toda iniciativa tiene historial desde el día 0.
      */
+    /**
+     * Valor de relleno para la columna {@code descripcion_solucion}, que sigue
+     * siendo NOT NULL en la DB pero ya no se pide en el formulario.
+     */
+    private static final String DESCRIPCION_SOLUCION_LEGACY = "";
+
     @Transactional
     public IniciativaResponse crear(IniciativaRequest req) {
         OffsetDateTime ahora = OffsetDateTime.now();
         Iniciativa i = Iniciativa.builder()
                 .titulo(req.titulo())
                 .descripcionProblema(req.descripcionProblema())
-                .descripcionSolucion(req.descripcionSolucion())
+                .descripcionSolucion(DESCRIPCION_SOLUCION_LEGACY)
                 .areaSolicitante(req.areaSolicitante())
                 .responsable(req.responsable())
                 .sponsorEjecutivo(req.sponsorEjecutivo())
                 .impactoEsperado(req.impactoEsperado())
                 .datosDisponibles(req.datosDisponibles())
+                .quienUsaYPara(req.quienUsaYPara())
+                .comoSeHaceHoy(req.comoSeHaceHoy())
+                .loQueHaySaber(req.loQueHaySaber())
+                .tiempoEstimado(req.tiempoEstimado())
+                .informacionAccesible(req.informacionAccesible())
                 .estado(EstadoIniciativa.SIN_EVALUAR)
                 .fechaCreacion(ahora)
                 .usuarioCreador(req.usuarioCreador())
@@ -62,12 +73,17 @@ public class IniciativaService {
                 .numeroVersion(1)
                 .titulo(req.titulo())
                 .descripcionProblema(req.descripcionProblema())
-                .descripcionSolucion(req.descripcionSolucion())
+                .descripcionSolucion(DESCRIPCION_SOLUCION_LEGACY)
                 .areaSolicitante(req.areaSolicitante())
                 .responsable(req.responsable())
                 .sponsorEjecutivo(req.sponsorEjecutivo())
                 .impactoEsperado(req.impactoEsperado())
                 .datosDisponibles(req.datosDisponibles())
+                .quienUsaYPara(req.quienUsaYPara())
+                .comoSeHaceHoy(req.comoSeHaceHoy())
+                .loQueHaySaber(req.loQueHaySaber())
+                .tiempoEstimado(req.tiempoEstimado())
+                .informacionAccesible(req.informacionAccesible())
                 .usuarioVersion(req.usuarioCreador())
                 .fechaVersion(ahora)
                 .comentarioVersion("Versión inicial")
@@ -121,12 +137,17 @@ public class IniciativaService {
                 .numeroVersion(nuevoNumero)
                 .titulo(req.titulo())
                 .descripcionProblema(req.descripcionProblema())
-                .descripcionSolucion(req.descripcionSolucion())
+                .descripcionSolucion(DESCRIPCION_SOLUCION_LEGACY)
                 .areaSolicitante(req.areaSolicitante())
                 .responsable(req.responsable())
                 .sponsorEjecutivo(req.sponsorEjecutivo())
                 .impactoEsperado(req.impactoEsperado())
                 .datosDisponibles(req.datosDisponibles())
+                .quienUsaYPara(req.quienUsaYPara())
+                .comoSeHaceHoy(req.comoSeHaceHoy())
+                .loQueHaySaber(req.loQueHaySaber())
+                .tiempoEstimado(req.tiempoEstimado())
+                .informacionAccesible(req.informacionAccesible())
                 .usuarioVersion(req.usuarioVersion())
                 .fechaVersion(ahora)
                 .comentarioVersion(req.comentarioVersion())
@@ -136,12 +157,16 @@ public class IniciativaService {
         // Reflejar el contenido vigente en la iniciativa.
         i.setTitulo(req.titulo());
         i.setDescripcionProblema(req.descripcionProblema());
-        i.setDescripcionSolucion(req.descripcionSolucion());
         i.setAreaSolicitante(req.areaSolicitante());
         i.setResponsable(req.responsable());
         i.setSponsorEjecutivo(req.sponsorEjecutivo());
         i.setImpactoEsperado(req.impactoEsperado());
         i.setDatosDisponibles(req.datosDisponibles());
+        i.setQuienUsaYPara(req.quienUsaYPara());
+        i.setComoSeHaceHoy(req.comoSeHaceHoy());
+        i.setLoQueHaySaber(req.loQueHaySaber());
+        i.setTiempoEstimado(req.tiempoEstimado());
+        i.setInformacionAccesible(req.informacionAccesible());
         i.setNumeroVersionActual(nuevoNumero);
 
         return Mapper.toVersionResponse(guardada, nuevoNumero);

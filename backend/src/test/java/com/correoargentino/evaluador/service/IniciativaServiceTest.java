@@ -37,13 +37,17 @@ class IniciativaServiceTest {
     private IniciativaRequest reqBase() {
         return new IniciativaRequest(
                 "Asistente IA reclamos",
-                "Los reclamos llegan sin clasificar y demoran.",
-                "Modelo NLP que clasifica y rutea automáticamente.",
                 "Atención al cliente",
-                "Ana Pérez",
+                "Ana Pérez — Jefa de operaciones",
                 "Roberto Gómez",
+                "Los reclamos llegan sin clasificar y demoran.",
+                "Equipo de Atención al Cliente para clasificar reclamos entrantes.",
                 "Bajar TTR 30%.",
                 "Tickets de 24 meses con categoría.",
+                "Hoy se clasifica manualmente con SLA de 48 hs.",
+                "Necesitamos confirmación legal sobre el uso de datos personales.",
+                "3 a 6 meses",
+                "Sí, accesible digitalmente",
                 "ana.perez"
         );
     }
@@ -51,13 +55,17 @@ class IniciativaServiceTest {
     private CrearVersionIniciativaRequest versionReq(String titulo, String comentario) {
         return new CrearVersionIniciativaRequest(
                 titulo,
-                "Reclamos sin clasificar — actualizado.",
-                "Modelo NLP v2 que además detecta sentimiento.",
                 "Atención al cliente",
-                "Ana Pérez",
+                "Ana Pérez — Jefa de operaciones",
                 "Roberto Gómez",
+                "Reclamos sin clasificar — actualizado.",
+                "Equipo de AC + Supervisores para validar la propuesta del modelo.",
                 "Bajar TTR 35%.",
                 "Tickets de 36 meses con categoría y sentimiento.",
+                "Clasificación manual con feedback semanal.",
+                "Pendiente acuerdo con seguridad informática para acceso al dataset.",
+                "6 a 12 meses",
+                "Existe pero es difícil de acceder",
                 "ana.perez",
                 comentario
         );
