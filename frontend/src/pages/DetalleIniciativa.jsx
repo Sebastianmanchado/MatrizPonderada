@@ -119,18 +119,46 @@ export function DetalleIniciativa() {
           <CardTitle>Datos del intake (versión actual)</CardTitle>
         </CardHeader>
         <CardBody className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Campo label="Área solicitante">{data.areaSolicitante}</Campo>
-          <Campo label="Responsable">{data.responsable}</Campo>
+          <Campo label="Area solicitante">{data.areaSolicitante}</Campo>
+          <Campo label="Nombre y cargo">{data.responsable}</Campo>
           <Campo label="Sponsor ejecutivo">{data.sponsorEjecutivo}</Campo>
           <div className="md:col-span-3">
-            <Campo label="Descripción del problema">{data.descripcionProblema}</Campo>
+            <Campo label="1. ¿Cuál es el problema o la oportunidad que se necesita resolver?">
+              {data.descripcionProblema}
+            </Campo>
           </div>
           <div className="md:col-span-3">
-            <Campo label="Descripción de la solución">{data.descripcionSolucion}</Campo>
+            <Campo label="2. ¿Quién es el usuario final del sistema y qué haría con él?">
+              {data.quienUsaYPara}
+            </Campo>
           </div>
-          <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Campo label="Impacto esperado">{data.impactoEsperado}</Campo>
-            <Campo label="Datos disponibles">{data.datosDisponibles}</Campo>
+          <div className="md:col-span-3">
+            <Campo label="3. ¿Qué mejora concreta se espera ver si esto funciona?">
+              {data.impactoEsperado}
+            </Campo>
+          </div>
+          <div className="md:col-span-3">
+            <Campo label="Tiempo estimado para ver ese resultado">{data.tiempoEstimado}</Campo>
+          </div>
+          <div className="md:col-span-3">
+            <Campo label="4. ¿Qué información o registros existen sobre este proceso hoy?">
+              {data.datosDisponibles}
+            </Campo>
+          </div>
+          <div className="md:col-span-3">
+            <Campo label="¿Esa información está en un sistema accesible?">
+              {data.informacionAccesible}
+            </Campo>
+          </div>
+          <div className="md:col-span-3">
+            <Campo label="5. ¿Cómo se resuelve este problema hoy, sin IA?">
+              {data.comoSeHaceHoy}
+            </Campo>
+          </div>
+          <div className="md:col-span-3">
+            <Campo label="6. ¿Hay alguna restricción, dependencia o riesgo que el equipo de IA debería conocer?">
+              {data.loQueHaySaber}
+            </Campo>
           </div>
         </CardBody>
       </Card>
@@ -198,17 +226,29 @@ export function DetalleIniciativa() {
                   </button>
                   {expandida && (
                     <div className="mt-3 pt-3 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Campo label="Área">{v.areaSolicitante}</Campo>
-                      <Campo label="Responsable">{v.responsable}</Campo>
-                      <Campo label="Sponsor">{v.sponsorEjecutivo}</Campo>
+                      <Campo label="Área solicitante">{v.areaSolicitante}</Campo>
+                      <Campo label="Nombre y cargo">{v.responsable}</Campo>
+                      <Campo label="Sponsor ejecutivo">{v.sponsorEjecutivo}</Campo>
                       <div className="md:col-span-3">
-                        <Campo label="Problema">{v.descripcionProblema}</Campo>
+                        <Campo label="1. Problema o oportunidad">{v.descripcionProblema}</Campo>
                       </div>
                       <div className="md:col-span-3">
-                        <Campo label="Solución">{v.descripcionSolucion}</Campo>
+                        <Campo label="2. Quién lo va a usar y para qué">{v.quienUsaYPara}</Campo>
                       </div>
-                      <Campo label="Impacto esperado">{v.impactoEsperado}</Campo>
-                      <Campo label="Datos disponibles">{v.datosDisponibles}</Campo>
+                      <Campo label="3. Valor que generaría">{v.impactoEsperado}</Campo>
+                      <Campo label="Tiempo estimado">{v.tiempoEstimado}</Campo>
+                      <div className="md:col-span-3">
+                        <Campo label="4. Información disponible">{v.datosDisponibles}</Campo>
+                      </div>
+                      <Campo label="¿Información accesible?">{v.informacionAccesible}</Campo>
+                      <div className="md:col-span-3">
+                        <Campo label="5. Cómo se hace hoy">{v.comoSeHaceHoy}</Campo>
+                      </div>
+                      <div className="md:col-span-3">
+                        <Campo label="6. Lo que hay que saber antes de avanzar">
+                          {v.loQueHaySaber}
+                        </Campo>
+                      </div>
                     </div>
                   )}
                 </div>
