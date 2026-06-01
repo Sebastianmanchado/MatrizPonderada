@@ -36,15 +36,14 @@
         </dependency>
 
         <!--
-            Flyway queda fuera del classpath: en este despliegue Hibernate
-            gestiona el schema con ddl-auto=update. Si en el futuro se vuelve
-            a usar Flyway sobre PostgreSQL, hay que portar V1/V2 a sintaxis
-            PG (ver README, sección "Migración a PostgreSQL").
+            Flyway queda fuera del classpath: Hibernate gestiona el schema
+            con ddl-auto=update. Las migraciones V1/V2 quedan en disco
+            como referencia histórica (T-SQL puro).
         -->
 
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
             <scope>runtime</scope>
         </dependency>
 

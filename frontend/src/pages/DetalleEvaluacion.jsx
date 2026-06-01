@@ -115,34 +115,48 @@ export function DetalleEvaluacion() {
           </CardHeader>
           <CardBody className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <p className="text-xs text-slate-500">Área</p>
+              <p className="text-xs text-slate-500">Area solicitante</p>
               <p>{data.iniciativaVersion.areaSolicitante}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Responsable</p>
+              <p className="text-xs text-slate-500">Nombre y cargo</p>
               <p>{data.iniciativaVersion.responsable}</p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">Sponsor</p>
+              <p className="text-xs text-slate-500">Sponsor ejecutivo</p>
               <p>{data.iniciativaVersion.sponsorEjecutivo}</p>
             </div>
             <div className="md:col-span-3">
-              <p className="text-xs text-slate-500">Problema</p>
+              <p className="text-xs text-slate-500">1. El problema o la oportunidad</p>
               <p className="whitespace-pre-wrap">{data.iniciativaVersion.descripcionProblema}</p>
             </div>
             <div className="md:col-span-3">
-              <p className="text-xs text-slate-500">Solución</p>
-              <p className="whitespace-pre-wrap">{data.iniciativaVersion.descripcionSolucion}</p>
+              <p className="text-xs text-slate-500">2. Quién lo va a usar y para qué</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.quienUsaYPara}</p>
             </div>
-            <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-slate-500">Impacto esperado</p>
-                <p className="whitespace-pre-wrap">{data.iniciativaVersion.impactoEsperado}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Datos disponibles</p>
-                <p className="whitespace-pre-wrap">{data.iniciativaVersion.datosDisponibles}</p>
-              </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">3. Valor que generaría</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.impactoEsperado}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">Tiempo estimado para ver ese resultado</p>
+              <p>{data.iniciativaVersion.tiempoEstimado || '—'}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">4. Información disponible</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.datosDisponibles}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">¿Esa información está en un sistema accesible?</p>
+              <p>{data.iniciativaVersion.informacionAccesible || '—'}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">5. Cómo se hace hoy</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.comoSeHaceHoy}</p>
+            </div>
+            <div className="md:col-span-3">
+              <p className="text-xs text-slate-500">6. Lo que hay que saber antes de avanzar</p>
+              <p className="whitespace-pre-wrap">{data.iniciativaVersion.loQueHaySaber}</p>
             </div>
           </CardBody>
         </Card>

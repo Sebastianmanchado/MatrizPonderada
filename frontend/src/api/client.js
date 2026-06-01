@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+// En producción dejamos baseURL vacío para que axios use rutas relativas
+// (mismo origin que el frontend). Vercel se encarga de hacer rewrite de
+// /api/* hacia el backend en Render (ver frontend/vercel.json).
+// Eso evita que el navegador del usuario intente conectarse directamente
+// a onrender.com, que en algunas redes corporativas está bloqueado.
+//
+// En desarrollo local apuntamos al backend en localhost:8080, salvo que se
+// override con VITE_API_BASE_URL en .env.
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.PROD ? '' : 'http://localhost:8080');
 
 export const api = axios.create({
   baseURL,
