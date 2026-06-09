@@ -56,7 +56,24 @@ npm run dev
 
 La UI escucha en `http://localhost:5173` y llama al backend en `http://localhost:8080`.
 
-## Endpoints REST
+## Frontend en Vercel + backend en Render
+
+El front llama al back de dos formas posibles (ver `frontend/src/api/client.js` y `frontend/vercel.json`):
+
+| Modo | Vercel | Render |
+| ---- | ------ | ------ |
+| **A — Proxy** (default) | Root Directory = `frontend`. No setear `VITE_API_BASE_URL`. `vercel.json` reescribe `/api/*` → Render. | Solo DB + variables habituales. |
+| **B — Directo** | `VITE_API_BASE_URL=https://matriz-ponderada-backend.onrender.com` | `FRONTEND_URL=https://TU-APP.vercel.app` (sin `/` final) |
+
+### Si el front carga pero falla al listar iniciativas
+
+1. **Vercel → Settings → Environment Variables**: si existe `VITE_API_BASE_URL=http://localhost:8080`, **borrala** o cambiala por la URL de Render. Requiere **redeploy** del front (las vars Vite se bakean en build).
+2. **Vercel → Settings → General → Root Directory** debe ser `frontend` (si no, `vercel.json` no aplica y `/api/*` devuelve 404).
+3. **Render → Environment**: `FRONTEND_URL` = URL exacta de tu app en Vercel (solo hace falta en modo B).
+4. Probá el backend directo: `https://matriz-ponderada-backend.onrender.com/api/matrices` — debe responder JSON (el primer request puede tardar ~30 s si el servicio estaba dormido).
+
+En DevTools → Network, si la request va a `onrender.com` y falla por CORS, usá modo B con `FRONTEND_URL` bien seteado o modo A sin `VITE_API_BASE_URL`.
+
 
 | Método | Path                                   | Descripción                                                              |
 | ------ | -------------------------------------- | ------------------------------------------------------------------------ |
